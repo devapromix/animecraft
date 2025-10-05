@@ -13,9 +13,9 @@ local prev_direction = 1
 local idle_amp = 1
 local decay_rate = 5  -- Швидкість затухання амплітуди при зупинці
 local head_rotation = 0  -- Кут повороту голови
-local head_half_height = 9  -- Половина висоти голови (припускаючи 18 пікселів)
-local max_head_angle = math.pi / 4
-local limb_offset = 30  -- Offset для рук і ніг
+local head_half_size = 9  -- Половина розміру голови (18x18 пікселів)
+local max_head_angle = math.pi / 8
+local limb_offset = 30 
 
 function love.load(args)
 	math.randomseed(os.time())
@@ -34,7 +34,8 @@ function d(x, y, s, dir)
 	local center_x = x + (3 * s)
 	local leg_y = y + (42 * s)
 	local arm_y = y + (18 * s) + 10
-	local head_y = y + head_half_height * s  -- Позиція центру голови
+	local head_y = y + head_half_size * s  -- Позиція центру голови
+	local head_x = x + head_half_size * s  -- Позиція центру голови
 	
 	-- Найдальший шар: ноги та задня рука (arm1)
 	love.graphics.draw(leg1, center_x + limb_offset * dir, leg_y, v * dir, -s * dir, s, joint_offset, 0)
@@ -43,8 +44,8 @@ function d(x, y, s, dir)
 	
 	-- Середній шар: тулуб та голова
 	n = 0 if dir == -1 then n = n - 60 end
-	love.graphics.draw(body, center_x + n, y + (18 * s), 0, s)
-	love.graphics.draw(head, center_x, head_y, head_rotation * dir, s * dir, s, joint_offset, head_half_height)
+	love.graphics.draw(body, center_x + n, y + (18 * s) - 20, 0, s)
+	love.graphics.draw(head, head_x, head_y, head_rotation * dir, s * dir, s, head_half_size, head_half_size)
 	
 	-- Найближчий шар: передня рука (arm2)
 	love.graphics.draw(arm2, center_x + limb_offset * dir, arm_y, arm_h * dir, s * dir, s, joint_offset, 0)
