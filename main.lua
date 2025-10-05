@@ -42,7 +42,8 @@ function d(x, y, s, dir)
 	love.graphics.draw(arm1, center_x + limb_offset * dir, arm_y, arm_v * dir, -s * dir, s, joint_offset, 0)
 	
 	-- Середній шар: тулуб та голова
-	love.graphics.draw(body, center_x, y + (18 * s), 0, s * dir, s, joint_offset, 0)
+	n = 0 if dir == -1 then n = n - 60 end
+	love.graphics.draw(body, center_x + n, y + (18 * s), 0, s)
 	love.graphics.draw(head, center_x, head_y, head_rotation * dir, s * dir, s, joint_offset, head_half_height)
 	
 	-- Найближчий шар: передня рука (arm2)
