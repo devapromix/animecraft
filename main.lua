@@ -11,6 +11,9 @@ local x_pos = 100
 local direction = 1
 local idle_amp = 1
 local decay_rate = 5  -- Швидкість затухання амплітуди при зупинці
+local head_rotation = 0  -- Кут повороту голови
+local head_half_height = 3  -- Половина висоти голови (припускаючи 6 пікселів)
+local max_head_angle = math.pi / 4
 
 function love.load(args)
 	math.randomseed(os.time())
@@ -31,6 +34,7 @@ function d(x, y, s, dir)
 	local arm_y = y + (18 * s) + 10
 	local arm_left = 30
 	local leg_left = 30
+	local head_y = y + head_half_height * s  -- Позиція центру голови
 	
 	-- Найдальший шар: ноги та задня рука (arm1)
 	love.graphics.draw(leg1, center_x + leg_left * dir, leg_y, v * dir, -s * dir, s, joint_offset, 0)
@@ -39,7 +43,7 @@ function d(x, y, s, dir)
 	
 	-- Середній шар: тулуб та голова
 	love.graphics.draw(body, center_x, y + (18 * s), 0, s * dir, s, joint_offset, 0)
-	love.graphics.draw(head, center_x, y, 0, s * dir, s, joint_offset, 0)
+	love.graphics.draw(head, center_x, head_y, head_rotation * dir, s * dir, s, joint_offset, head_half_height)
 	
 	-- Найближчий шар: передня рука (arm2)
 	love.graphics.draw(arm2, center_x + arm_left * dir, arm_y, arm_h * dir, s * dir, s, joint_offset, 0)
@@ -69,6 +73,25 @@ function love.update(dt)
 	-- Обертання для рук: синхронізовано протилежно до ніг (ліва рука з правою ногою, права рука з лівою)
 	arm_v = h * (arm_amp / leg_amp) * idle_amp  -- Ліва рука як права нога, але з меншою амплітудою
 	arm_h = v * (arm_amp / leg_amp) * idle_amp  -- Права рука як ліва нога
+	
+	-- Рух голови
+	if moving then
+		-- Анімовано до центру при русі
+		head_rotation = head_rotation * math.exp(-speed * dt)
+	else
+		-- Контроль головою тільки коли не рухається
+		local head_delta = 0
+		if love.keyboard.isDown("o") then
+			head_delta = -speed * dt  -- Вгору
+		end
+		if love.keyboard.isDown("l") then
+			head_delta = speed * dt  -- Вниз
+		end
+		head_rotation = head_rotation + head_delta
+	end
+	
+	-- Clamp до ±45°
+	head_rotation = math.max(-max_head_angle, math.min(max_head_angle, head_rotation))
 	
 	-- Рух
 	if love.keyboard.isDown("left") then
