@@ -9,11 +9,13 @@ local joint_offset = 3  -- X-offset для точки кріплення (вер
 local move_speed = 200  -- Швидкість руху (пікселів за секунду)
 local x_pos = 100
 local direction = 1
+local prev_direction = 1
 local idle_amp = 1
 local decay_rate = 5  -- Швидкість затухання амплітуди при зупинці
 local head_rotation = 0  -- Кут повороту голови
-local head_half_height = 3  -- Половина висоти голови (припускаючи 6 пікселів)
+local head_half_height = 9  -- Половина висоти голови (припускаючи 18 пікселів)
 local max_head_angle = math.pi / 4
+local limb_offset = 30  -- Offset для рук і ніг
 
 function love.load(args)
 	math.randomseed(os.time())
@@ -32,21 +34,19 @@ function d(x, y, s, dir)
 	local center_x = x + (3 * s)
 	local leg_y = y + (42 * s)
 	local arm_y = y + (18 * s) + 10
-	local arm_left = 30
-	local leg_left = 30
 	local head_y = y + head_half_height * s  -- Позиція центру голови
 	
 	-- Найдальший шар: ноги та задня рука (arm1)
-	love.graphics.draw(leg1, center_x + leg_left * dir, leg_y, v * dir, -s * dir, s, joint_offset, 0)
-	love.graphics.draw(leg2, center_x + leg_left * dir, leg_y, h * dir, s * dir, s, joint_offset, 0)
-	love.graphics.draw(arm1, center_x + arm_left * dir, arm_y, arm_v * dir, -s * dir, s, joint_offset, 0)
+	love.graphics.draw(leg1, center_x + limb_offset * dir, leg_y, v * dir, -s * dir, s, joint_offset, 0)
+	love.graphics.draw(leg2, center_x + limb_offset * dir, leg_y, h * dir, s * dir, s, joint_offset, 0)
+	love.graphics.draw(arm1, center_x + limb_offset * dir, arm_y, arm_v * dir, -s * dir, s, joint_offset, 0)
 	
 	-- Середній шар: тулуб та голова
 	love.graphics.draw(body, center_x, y + (18 * s), 0, s * dir, s, joint_offset, 0)
 	love.graphics.draw(head, center_x, head_y, head_rotation * dir, s * dir, s, joint_offset, head_half_height)
 	
 	-- Найближчий шар: передня рука (arm2)
-	love.graphics.draw(arm2, center_x + arm_left * dir, arm_y, arm_h * dir, s * dir, s, joint_offset, 0)
+	love.graphics.draw(arm2, center_x + limb_offset * dir, arm_y, arm_h * dir, s * dir, s, joint_offset, 0)
 end
 
 function love.draw()
@@ -74,6 +74,24 @@ function love.update(dt)
 	arm_v = h * (arm_amp / leg_amp) * idle_amp  -- Ліва рука як права нога, але з меншою амплітудою
 	arm_h = v * (arm_amp / leg_amp) * idle_amp  -- Права рука як ліва нога
 	
+	-- Рух
+	local new_direction = direction
+	if love.keyboard.isDown("left") then
+		x_pos = x_pos - move_speed * dt
+		new_direction = -1
+	end
+	if love.keyboard.isDown("right") then
+		x_pos = x_pos + move_speed * dt
+		new_direction = 1
+	end
+	
+	-- Компенсація стрибка при зміні напрямку
+	if new_direction ~= prev_direction and moving then
+		x_pos = x_pos - limb_offset * (new_direction - prev_direction)
+		prev_direction = new_direction
+	end
+	direction = new_direction
+	
 	-- Рух голови
 	if moving then
 		-- Анімовано до центру при русі
@@ -92,16 +110,6 @@ function love.update(dt)
 	
 	-- Clamp до ±45°
 	head_rotation = math.max(-max_head_angle, math.min(max_head_angle, head_rotation))
-	
-	-- Рух
-	if love.keyboard.isDown("left") then
-		x_pos = x_pos - move_speed * dt
-		direction = -1
-	end
-	if love.keyboard.isDown("right") then
-		x_pos = x_pos + move_speed * dt
-		direction = 1
-	end
 end
 
 function love.keypressed(key, unicode) 
