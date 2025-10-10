@@ -19,7 +19,7 @@ local limb_offset = 30
 
 function love.load(args)
 	math.randomseed(os.time())
-	love.graphics.setDefaultFilter("nearest", "nearest")
+	--love.graphics.setDefaultFilter("nearest", "nearest")
 	love.window.setVSync(1)
 
 	body = love.graphics.newImage("assets/mobs/stive/body.png")
@@ -43,16 +43,16 @@ function d(x, y, s, dir)
 	love.graphics.draw(arm1, center_x + limb_offset * dir, arm_y, arm_v * dir, -s * dir, s, joint_offset, 0)
 	
 	-- Середній шар: тулуб та голова
-	n = 0 if dir == -1 then n = n - 60 end
+	n = 0 h = 0 if dir == -1 then n = n - 60 h = h - 60 end
 	love.graphics.draw(body, center_x + n, y + (18 * s) - 20, 0, s)
-	love.graphics.draw(head, head_x, head_y, head_rotation * dir, s * dir, s, head_half_size, head_half_size)
+	love.graphics.draw(head, head_x + h, head_y, head_rotation * dir, s * dir, s, head_half_size, head_half_size)
 	
 	-- Найближчий шар: передня рука (arm2)
 	love.graphics.draw(arm2, center_x + limb_offset * dir, arm_y, arm_h * dir, s * dir, s, joint_offset, 0)
 end
 
 function love.draw()
-	d(x_pos, 100, 5, direction)
+	d(x_pos, 500, 5, direction)
 end
 
 function love.update(dt)
