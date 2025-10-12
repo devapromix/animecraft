@@ -28,6 +28,9 @@ function love.load(args)
 	leg2 = love.graphics.newImage("assets/mobs/stive/leg.png")
 	arm1 = love.graphics.newImage("assets/mobs/stive/arm.png")
 	arm2 = love.graphics.newImage("assets/mobs/stive/arm.png")
+	
+	tree.load()
+	tree.generate(100, 400)
 end
 
 function d(x, y, s, dir)
@@ -52,6 +55,7 @@ function d(x, y, s, dir)
 end
 
 function love.draw()
+	tree.draw()
 	d(x_pos, 500, 5, direction)
 end
 
@@ -115,7 +119,8 @@ function love.update(dt)
 end
 
 function love.keypressed(key, unicode) 
-	if key == 'space' then
+	if key == 'r' then
+		tree.generate(100, 400)
 	end
 end
 
