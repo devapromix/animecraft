@@ -29,8 +29,8 @@ function love.load(args)
 	arm1 = love.graphics.newImage("assets/mobs/stive/arm.png")
 	arm2 = love.graphics.newImage("assets/mobs/stive/arm.png")
 	
-	tree.load()
-	tree.generate(100, 400)
+	forest.load()
+	forest.generate()
 end
 
 function d(x, y, s, dir)
@@ -55,8 +55,8 @@ function d(x, y, s, dir)
 end
 
 function love.draw()
-	tree.draw()
-	d(x_pos, 500, 5, direction)
+	forest.draw()
+	d(x_pos, 550, 5, direction)
 end
 
 function love.update(dt)
@@ -120,7 +120,7 @@ end
 
 function love.keypressed(key, unicode) 
 	if key == 'r' then
-		tree.generate(100, 400)
+		forest.generate()
 	end
 end
 
