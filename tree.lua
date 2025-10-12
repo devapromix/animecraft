@@ -32,10 +32,8 @@ function tree.generate(x, y)
     while current_y >= upper_leaf_y do
         local has_trunk = trunk_set[current_y] or false
         for dx = -current_side, current_side do
-            if not (dx == 0 and has_trunk) then
-                local leaf_x = trunk_x + dx * bs
-                table.insert(parts, {x = leaf_x, y = current_y, type = 'leaves'})
-            end
+            local leaf_x = trunk_x + dx * bs
+            table.insert(parts, {x = leaf_x, y = current_y, type = 'leaves'})
         end
         local next_side
         if has_trunk then
